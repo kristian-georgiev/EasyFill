@@ -4,7 +4,7 @@ from PIL import ImageFilter
 
 def is_white(pixel_val):
     """tuple with (r, g, b) values"""
-    return (pixel_val[0] + pixel_val[1] + pixel_val[2]) > 250*3 or pixel_val[1] > 250 # allow a small noise for white
+    return pixel_val > 250 # allow a small noise for white
 
 def inside_image(coords):
     global img
@@ -161,13 +161,13 @@ def fill_white(ul, lr): # fill in rectangle from upper-left to lower-right
     global img
     for col in range(ul[0], lr[0]+1):
         for row in range(ul[1], lr[1]+1):
-            img[col, row] = (0, 255, 0) # make everything green!
+            img[col, row] = 255 # make everything green!
             
 def fill_box(ul, lr): # fill in rectangle from upper-left to lower-right
     global img
     for col in range(ul[0], lr[0]+1):
         for row in range(ul[1], lr[1]+1):
-            img[col, row] = (255, 255, 255) # make everything white!
+            img[col, row] = 255 # make everything white!
     
 def white_pixels(up, left, down, right): # get number of white pixels in rectangle from upper-left to lower-right
     global dp
@@ -213,7 +213,7 @@ def initialize_blanks(): # must give image in some form
   im = Image.open("empty_w2.jpg")
   im1 = im.filter(ImageFilter.FIND_EDGES)
   im2 = im1.filter(ImageFilter.MaxFilter(size=7))
-  rgb_im1 = im2.convert('RGB')
+  rgb_im1 = im2.convert('L')
   rgb_im1.show()
   global img
   global dp
