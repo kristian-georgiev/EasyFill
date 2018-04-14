@@ -209,8 +209,8 @@ def find_blank(num_points=40):
         #fill_box((point[0]-10, point[1]-10), (point[0]+10, point[1]+10))
     return boxes
 
-def initialize_blanks(): # must give image in some form
-  im = Image.open("empty_w2.jpg")
+def initialize_blanks(filename): # must give image in some form
+  im = Image.open(filename)
   im1 = im.filter(ImageFilter.FIND_EDGES)
   im2 = im1.filter(ImageFilter.MaxFilter(size=7))
   rgb_im1 = im2.convert('L')
