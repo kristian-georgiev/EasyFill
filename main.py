@@ -4,7 +4,7 @@
 # from kivy.core.image import Image as CoreImage
 # from kivy.uix.image import Image
 # import time
-
+import talkey
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
@@ -45,11 +45,29 @@ class CameraScreen(Screen):
 class ControlScreen(Screen):
 
     def __init__(self, **kwargs):
-        print("reached here")
         super(ControlScreen, self).__init__(**kwargs) 
 
-    def displayScreenThenLeave(self):
-        self.changeScreen()
+    # def displayScreenThenLeave(self):
+    #     self.changeScreen()
+    def repeatSound(self):
+        print("repeatSound")
+        # implement repeatSOund
+    def goBack(self):
+        print("goBack")
+        # implement goBack
+    def goNext(self):
+        print("goNext")
+        # implement goNext
+    def fill(self):
+        print("fill")
+        # implement fill
+    def help(self):
+        print("help")
+        # implement help
+    def print(self):
+        print("print")
+        # implement print
+
 
 
 
