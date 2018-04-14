@@ -4,8 +4,8 @@
 
     BoxLayout:
         size: root.size
-        spacing: 20
-        padding: 20
+        spacing: 10
+        padding: 10
         orientation: 'vertical'
         Camera:
             id: camera
@@ -26,9 +26,20 @@
         spacing: 10
         padding: 10
 
-        Button:
-            id: "repeat"
-            text: "REPEAT"
+        BoxLayout:
+            orientation: "horizontal"
+            size: root.size
+            spacing: 10
+            padding: 10
+
+            Button:
+                id: "help"
+                text: "HELP"
+                on_press: root.help()
+            Button:
+                id: "print"
+                text: "PRINT"
+                on_press: root.print()
 
         BoxLayout:
             orientation: "horizontal"
@@ -39,9 +50,25 @@
             Button:
                 id: "back"
                 text: "BACK"
+                on_press: root.goBack()
             Button:
                 id: "next / FILL"
                 text: "NEXT"
+                on_press: root.goNext()
+        BoxLayout:
+            orientation: "horizontal"
+            size: root.size
+            spacing: 10
+            padding: 10
+
+            Button:
+                id: "repeat"
+                text: "REPEAT"
+                on_press: root.repeatSound()
+            Button:
+                id: "fill"
+                text: "FILL"
+                on_press: root.fill()
 
 
 <PrintScreen>:
@@ -49,8 +76,8 @@
     BoxLayout:
         orientation: "vertical"
         size: root.size
-        spacing: 20
-        padding: 20
+        spacing: 10
+        padding: 10
 
         Label:
             text: "Welcome to EasyFill!"

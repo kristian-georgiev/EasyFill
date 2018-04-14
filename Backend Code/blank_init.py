@@ -25,22 +25,80 @@ def extend_dir(coords, direction):
         temp_coords = (temp_coords[0] + direction[0], temp_coords[1] + direction[1])
     return width
 
+def extend_up(coords):
+    high = coords[1]
+    low = 0
+    ans = coords[1]
+    
+    while low <= high:
+        med = (low + high)//2
+        if white_pixels(med, coords[0], coords[1], coords[0]) <= 0:
+            high = med-1
+            ans = min(ans, med)
+        else:
+            low = med+1
+    return coords[1]-ans
+    
+def extend_down(coords):
+    global height
+    low = coords[1]
+    high = height-1
+    ans = coords[1]
+    
+    while low <= high:
+        med = (low + high)//2
+        if white_pixels(coords[1], coords[0], med, coords[0]) <= 0:
+            low = med+1
+            ans = max(ans, med)
+        else:
+            high = med-1
+    return ans-coords[1]
+    
+def extend_left(coords):
+    high = coords[0]
+    low = 0
+    ans = coords[0]
+    
+    while low <= high:
+        med = (low + high)//2
+        if white_pixels(coords[1], med, coords[1], coords[0]) <= 0:
+            high = med-1
+            ans = min(ans, med)
+        else:
+            low = med+1
+    return coords[0]-ans
+    
+def extend_right(coords):
+    global width
+    low = coords[0]
+    high = width-1
+    ans = coords[0]
+    
+    while low <= high:
+        med = (low + high)//2
+        if white_pixels(coords[1], coords[0], coords[1], med) <= 0:
+            low = med+1
+            ans = max(ans, med)
+        else:
+            high = med-1
+    return ans-coords[0]
+    
 def border_distance(coords):
-    return min(extend_dir(coords, (-1, 0)), extend_dir(coords, (1, 0)), extend_dir(coords, (0, 1)), extend_dir(coords, (0, -1)))
+    return min(extend_up(coords), extend_down(coords), extend_left(coords), extend_right(coords))
 
 def max_distance_pixel():
     global width
     global height
     max_border_distance = 0
     candidate_pixel = (1, 1)
-    for i in range(0, width, 3):
+    for i in range(0, width, 7):
         for j in range(0, height, 3):
             pixel_distance = border_distance((i, j))
             if pixel_distance > max_border_distance:
                 max_border_distance = pixel_distance
                 candidate_pixel = (i, j)
     return candidate_pixel
-    
+
 def expand_rectangle_dp(pixel):
     best_area = 0
     best_coords = (0, 0, 0, 0)
@@ -51,7 +109,9 @@ def expand_rectangle_dp(pixel):
             # down will be at pixel[1] + j
             up = pixel[1] - i
             down = pixel[1] + j
-            if (not inside_image((pixel[0], up))) or (not inside_image((pixel[0], down))):
+            if (not inside_image((pixel[0], up))):
+                break
+            if (not inside_image((pixel[0], down))):
                 continue
             if white_pixels(up, pixel[0], down, pixel[0]) != 0:
                 continue
@@ -156,7 +216,7 @@ def expand_left_right(up, down, line):
         if not inside_image((line, i)) or is_white(img[(line, i)]):
             return False # cannot expand
     return True
-    
+
 def fill_white(ul, lr): # fill in rectangle from upper-left to lower-right
     global img
     for col in range(ul[0], lr[0]+1):
@@ -196,8 +256,8 @@ def preprocess_dp():
                 dp[i].append(int(is_white(img[i, j])))
             else:
                 dp[i].append(int(dp[i-1][j] + dp[i][j-1] - dp[i-1][j-1] + int(is_white(img[i, j]))))
-
-def find_blank(num_points=40):
+                
+def find_blank(num_points=5):
     boxes = []
     for num in range(num_points):
         preprocess_dp()
@@ -209,16 +269,20 @@ def find_blank(num_points=40):
         #fill_box((point[0]-10, point[1]-10), (point[0]+10, point[1]+10))
     return boxes
 
-def initialize_blanks(filename): # must give image in some form
-  im = Image.open(filename)
-  im1 = im.filter(ImageFilter.FIND_EDGES)
-  im2 = im1.filter(ImageFilter.MaxFilter(size=7))
-  rgb_im1 = im2.convert('L')
-  rgb_im1.show()
-  global img
-  global dp
-  global width
-  global height
-  width, height = rgb_im1.size
-  img = rgb_im1.load()
-  return find_blank()
+def blank_init(filename):
+    im = Image.open(filename)
+    im1 = im.filter(ImageFilter.FIND_EDGES)
+    im2 = im1.filter(ImageFilter.MaxFilter(size=7))
+    rgb_im1 = im2.convert('L')
+    #rgb_im1.show()
+    global img
+    global dp
+    global width
+    global height
+    width, height = rgb_im1.size
+    #print(width)
+    #print(height)
+    img = rgb_im1.load()
+    poullas = find_blank()
+    #rgb_im1.show()
+    return poullas
