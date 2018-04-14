@@ -4,6 +4,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.core.image import Image as CoreImage
 from kivy.uix.image import Image
 import time
+import pyttsx
 Builder.load_string('''
 <CameraClick>:
     orientation: 'vertical'
@@ -43,4 +44,10 @@ class TestCamera(App):
         return CameraClick()
 
 
+
+
 TestCamera().run()
+engine = pyttsx.init()
+engine.say('Sally sells seashells by the seashore.')
+engine.say('The quick brown fox jumped over the lazy dog.')
+engine.runAndWait()
