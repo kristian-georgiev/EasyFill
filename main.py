@@ -13,6 +13,8 @@ import time
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
 from kivy.properties import ObjectProperty, NumericProperty
+from kivy.uix.textinput import TextInput
+from playsound import playsound
 
 import time
 import threading
@@ -29,6 +31,9 @@ import argparse
 import cv2
 import imutils
 from tesserocr import PyTessBaseAPI, PSM, RIL
+
+from pygame import mixer
+
 
 
 
@@ -55,6 +60,7 @@ class CameraScreen(Screen):
 class ControlScreen(Screen):
     global filename
     filename = "IMG"
+
     def __init__(self, **kwargs):
         super(ControlScreen, self).__init__(**kwargs) 
 
@@ -174,6 +180,7 @@ class ControlScreen(Screen):
         im2, contours, hierarchy = cnts
         cnts = cnts[0] if imutils.is_cv2() else cnts[1]
         cnts = sorted(cnts, key=cv2.contourArea, reverse=True)[:5]
+        screenCnt = None
 
         # loop over the contours
         for c in cnts:
@@ -196,7 +203,15 @@ class ControlScreen(Screen):
 
         # apply the four point transform to obtain a top-down
         # view of the original image
-        warped = four_point_transform(image, screenCnt.reshape(4, 2) * ratio)
+        if screenCnt is not None:
+            warped = four_point_transform(image, screenCnt.reshape(4, 2) * ratio)
+        else:
+            # mixer.init()
+            # mixer.music.load('mistake.mp3')
+            # mixer.music.play()
+            # warped = None
+            return None
+            # CameraScreen.capture()
 
         # convert the warped image to grayscale, then threshold it
         # to give it that 'black and white' paper effect
@@ -233,7 +248,7 @@ class ControlScreen(Screen):
 
         THRESHOLD_VALUE = 200
 
-        filename = "fake_form.jpg"
+        # filename = "fake_form.jpg"
         image = Image.open(filename)
         image = image.convert("L")
         # image.show()
@@ -251,7 +266,7 @@ class ControlScreen(Screen):
 
         image = image.rotate(90 * orientation)
 
-        blocks = {}
+        blocks = []
         with PyTessBaseAPI() as api:
             api.SetImage(image)
             boxes = api.GetComponentImages(RIL.TEXTLINE, True)
@@ -261,7 +276,7 @@ class ControlScreen(Screen):
                 # box is a dict with x, y, w and h keys
                 api.SetRectangle(box['x'], box['y'], box['w'], box['h'])
                 ocrResult = api.GetUTF8Text()
-                blocks[ocrResult] = box
+                blocks.append((box,ocrResult))
                 conf = api.MeanTextConf()
                 print((u"Box[{0}]: x={x}, y={y}, w={w}, h={h}, " "confidence: {1}, text: {2}").format(
                     i, conf, ocrResult, **box))
@@ -956,9 +971,15 @@ class ControlScreen(Screen):
     # blocks = self.create_blocks_of_text(filename)
     # blanks = self.blank_init(filename)
     def init_things(self):
-        scan = self.scan(filename)
-        blocks = self.create_blocks_of_text(filename)
-        blanks = self.blank_init(filename)
+        self.scan69 = self.scan(filename)
+        self.document = Image.open(filename)
+        self.document.show()
+        self.blocks = self.create_blocks_of_text(filename)
+        self.blanks = self.blank_init(filename)
+        self.i = 0
+        self.n = len(self.blocks) 
+        self.input = ''
+
 
     # ------------------------
     # ------------------------
@@ -978,24 +999,64 @@ class ControlScreen(Screen):
 
     # def displayScreenThenLeave(self):
     #     self.changeScreen()
+    # @staticmethod
+    def on_enter1(instance, value):
+        self.input = value
+
     def repeatSound(self):
         print("repeatSound")
+        text = self.blocks[self.i][1]
+        tts = gTTS(text=text, lang='en', slow=True)
+        tts.save("field%s.mp3"%self.i)
+        playsound("field%s.mp3"%self.i)
+
         # implement repeatSOund
     def goBack(self):
         print("goBack")
+        if self.i > 0:
+            self.i -= 1
+            text = self.blocks[self.i][1]
+            tts = gTTS(text=text, lang='en', slow=True)
+            tts.save("field%s.mp3"%self.i)
+            playsound("field%s.mp3"%self.i)
+
         # implement goBack
     def goNext(self):
         print("goNext")
         # implement goNext
-    def fill(self):
+        if self.i < self.n-1    :
+            self.i += 1
+            text = self.blocks[self.i][1]
+            tts = gTTS(text=text, lang='en', slow=True)
+            tts.save("field%s.mp3"%self.i)
+            playsound("field%s.mp3"%self.i)
+def fill(self):
         print("fill")
+        # we want a text box to appear
+        # when e
+        textinput = TextInput(text='', multiline=False)
+        textinput.bind(on_text_validate=on_enter1)
+        self.blocks[self.i][1] = self.input
+
         # implement fill
     def help(self):
         print("help")
         self.test()
         # implement help
     def print_end(self):
+        for c in range(self.n):
+            x = self.blocks[c][0]['x']+self.blocks[c][0]['w']//2
+            y = self.blocks[c][0]['y']+self.blocks[c][0]['h']//2
+            idx = self.match((x,y), self.blanks)
+            start = self.blanks[idx][0] # tuple upper left
+            d = ImageDraw.Draw(self.document)
+            d.text((start[0]+4, start[1]+4), self.blocks[c][1])
+        # save image
+        # or show image
+        d.show()
+
         print("print")
+
         # implement print
     def test(self):
         # engine = pyttsx3.init()
