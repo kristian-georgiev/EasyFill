@@ -19,8 +19,6 @@ import time
 import threading
 
 from gtts import gTTS
-from PIL import Image
-from PIL import ImageFilter
 
 
 
