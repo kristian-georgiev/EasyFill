@@ -1,6 +1,6 @@
 #:kivy 1.8.0
 
-<ScreenOne>:
+<CameraScreen>:
 
     BoxLayout:
         orientation: "vertical"
@@ -14,11 +14,9 @@
             id: "Capture"
             text: "Button 1"
             on_release:
-                root.manager.current = "screen2"
-                # reset health_points
-                root.manager.ids.screen_two.health_points = 100
+                root.manager.current = "control_screen"
 
-<ScreenTwo>:        
+<ControlScreen>:        
 
     BoxLayout:
         orientation: "vertical"
@@ -38,23 +36,46 @@
 
             Button:
                 id: "back"
-                text: "BACK: " + str(root.health_points)
+                text: "BACK"
             Button:
                 id: "next / FILL"
-                text: "NEXT: " + str(root.health_points)
+                text: "NEXT"
+
+
+<PrintScreen>:
+
+    BoxLayout:
+        orientation: "vertical"
+        size: root.size
+        spacing: 20
+        padding: 20
+
+        Label:
+            text: "Welcome to EasyFill!"
+        Button:
+            id: "Capture"
+            text: "Button 1"
+            on_release:
+                root.manager.current = "control_screen"
 
 <Manager>:
     id: screen_manager
 
-    screen_one: screen_one
-    screen_two: screen_two
+    camera_screen: camera_screen
+    control_screen: control_screen
+    print_screen: print_screen
 
-    ScreenOne:
-        id: screen_one
-        name: "screen1"
+    CameraScreen:
+        id: camera_screen
+        name: "camera_screen"
         manager: screen_manager
 
-    ScreenTwo:
-        id: screen_two
-        name: "screen2"
+    ControlScreen:
+        id: control_screen
+        name: "control_screen"
+        manager: screen_manager
+
+    PrintScreen:
+        id: print_screen
+        name: "print_screen"
         manager: screen_manager
