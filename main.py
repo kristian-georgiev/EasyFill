@@ -999,7 +999,7 @@ class ControlScreen(Screen):
 
     # def displayScreenThenLeave(self):
     #     self.changeScreen()
-    # @staticmethod
+    @staticmethod
     def on_enter1(instance, value):
         self.input = value
 
@@ -1030,7 +1030,8 @@ class ControlScreen(Screen):
             tts = gTTS(text=text, lang='en', slow=True)
             tts.save("field%s.mp3"%self.i)
             playsound("field%s.mp3"%self.i)
-def fill(self):
+    
+    def fill(self):
         print("fill")
         # we want a text box to appear
         # when e
