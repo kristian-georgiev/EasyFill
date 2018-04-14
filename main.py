@@ -4,7 +4,6 @@
 # from kivy.core.image import Image as CoreImage
 # from kivy.uix.image import Image
 # import time
-import talkey
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
@@ -19,6 +18,8 @@ import time
 import threading
 
 from gtts import gTTS
+import os
+import pyttsx3
 
 
 
@@ -63,10 +64,19 @@ class ControlScreen(Screen):
         # implement fill
     def help(self):
         print("help")
+        self.test()
         # implement help
     def print(self):
         print("print")
         # implement print
+    def test(self):
+        engine = pyttsx3.init()
+        engine.say('Sally sells seashells by the seashore.')
+        engine.say('The quick brown fox jumped over the lazy dog.')
+        # engine.runAndWait()
+        print("5")
+        return 5
+
 
 
 
