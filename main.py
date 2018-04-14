@@ -21,22 +21,8 @@ import threading
 from gtts import gTTS
 
 
-Builder.load_string('''
-<CameraClick>:
-    orientation: 'vertical'
-    Camera:
-        id: camera
-        resolution: (1080, 540)
-        play: True
-    Button:
-        text: 'Capture'
-        size_hint_y: None
-        height: '60dp'
-        on_press: root.capture()
-''')
 
-
-class CameraClick(BoxLayout):
+class CameraScreen(Screen):
     def changeScreen(self):
         if self.manager.current == 'camera_screen':
             self.manager.current = 'control_screen'
@@ -52,31 +38,15 @@ class CameraClick(BoxLayout):
         timestr = time.strftime("%Y%m%d_%H%M%S")
         camera.export_to_png("IMG_" + timestr)
         print("Saved")
+        # self.changeScreen()
         return Image(source = "IMG_" + timestr)
-        self.changeScreen()
-
-class TestCamera(App):
-
-    def build(self):
-        return CameraClick()
-TestCamera().run()
-
-
-
-
-class CameraScreen(Screen):
-    pass
 
 
 class ControlScreen(Screen):
-    health_points = NumericProperty(100)
 
     def __init__(self, **kwargs):
         print("reached here")
-        super(ControlScreen, self).__init__(**kwargs)
-
-
-
+        super(ControlScreen, self).__init__(**kwargs) 
 
     def displayScreenThenLeave(self):
         self.changeScreen()
@@ -88,15 +58,15 @@ class PrintScreen(Screen):
 
 class Manager(ScreenManager):
 
-    screen_one = ObjectProperty(None)
-    screen_two = ObjectProperty(None)
-
+    camera_screen = ObjectProperty(None)
+    control_screen = ObjectProperty(None)
+    print_screen= ObjectProperty(None)
 
 class ScreensApp(App):
 
     def build(self):
-        m = Manager(transition=NoTransition())
-        return m
+        manager = Manager()
+        return manager
 
 
 if __name__ == "__main__":

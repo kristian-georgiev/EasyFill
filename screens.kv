@@ -3,20 +3,22 @@
 <CameraScreen>:
 
     BoxLayout:
-        orientation: "vertical"
         size: root.size
         spacing: 20
         padding: 20
-
-        Label:
-            text: "Welcome to EasyFill!"
+        orientation: 'vertical'
+        Camera:
+            id: camera
+            resolution: (1080, 540)
+            play: True
         Button:
-            id: "Capture"
-            text: "Button 1"
-            on_release:
-                root.manager.current = "control_screen"
+            text: 'Capture'
+            size_hint_y: None
+            height: '60dp'
+            on_press: root.capture()
+            on_release: root.manager.current = "control_screen"
 
-<ControlScreen>:        
+<ControlScreen>:       
 
     BoxLayout:
         orientation: "vertical"
