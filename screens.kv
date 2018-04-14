@@ -1,0 +1,60 @@
+#:kivy 1.8.0
+
+<ScreenOne>:
+
+    BoxLayout:
+        orientation: "vertical"
+        size: root.size
+        spacing: 20
+        padding: 20
+
+        Label:
+            text: "Welcome to EasyFill!"
+        Button:
+            id: "Capture"
+            text: "Button 1"
+            on_release:
+                root.manager.current = "screen2"
+                # reset health_points
+                root.manager.ids.screen_two.health_points = 100
+
+<ScreenTwo>:        
+
+    BoxLayout:
+        orientation: "vertical"
+        size: root.size
+        spacing: 10
+        padding: 10
+
+        Button:
+            id: "repeat"
+            text: "REPEAT"
+
+        BoxLayout:
+            orientation: "horizontal"
+            size: root.size
+            spacing: 10
+            padding: 10
+
+            Button:
+                id: "back"
+                text: "BACK: " + str(root.health_points)
+            Button:
+                id: "next / FILL"
+                text: "NEXT: " + str(root.health_points)
+
+<Manager>:
+    id: screen_manager
+
+    screen_one: screen_one
+    screen_two: screen_two
+
+    ScreenOne:
+        id: screen_one
+        name: "screen1"
+        manager: screen_manager
+
+    ScreenTwo:
+        id: screen_two
+        name: "screen2"
+        manager: screen_manager
