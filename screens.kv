@@ -1,22 +1,22 @@
 #:kivy 1.8.0
 
 <CameraScreen>:
-
+    on_enter: root.welcome()
+    
     BoxLayout:
         size: root.size
         spacing: 10
         padding: 10
         orientation: 'vertical'
         Camera:
-            id: camera
-            resolution: (1080,540)
+            id: camera  
             play: True
         Button:
             text: 'Capture'
             size_hint_y: None
             height: '60dp'
             on_press: root.capture()
-            on_release: root.manager.current = "control_screen"
+            on_release: root.changeScreen()
 
 <ControlScreen>:
     on_enter: root.init_things()  
@@ -37,7 +37,7 @@
             Button:
                 id: help
                 text: "HELP"
-                on_press: root.init_things()
+                on_press: root.help()
             Button:
                 id: print_end
                 text: "PRINT"
