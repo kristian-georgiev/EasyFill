@@ -21,8 +21,9 @@
 <ControlScreen>:       
 
     BoxLayout:
+        id: obas
         orientation: "vertical"
-        size: root.size
+        size_hint: 1,1  
         spacing: 10
         padding: 10
 
@@ -33,44 +34,50 @@
             padding: 10
 
             Button:
-                id: "help"
+                id: help
                 text: "HELP"
-                on_press: root.init_things()
+                on_press: root.help()
             Button:
-                id: "print_end"
+                id: print_end
                 text: "PRINT"
                 on_press: root.print_end()
 
         BoxLayout:
+            id: sixtynine
             orientation: "horizontal"
-            size: root.size
+            size_hint: (1,1)
             spacing: 10
             padding: 10
 
             Button:
-                id: "back"
+                id: back
                 text: "BACK"
                 on_press: root.goBack()
             Button:
-                id: "next / FILL"
+                id: next
                 text: "NEXT"
                 on_press: root.goNext()
         BoxLayout:
             orientation: "horizontal"
-            size: root.size
             spacing: 10
             padding: 10
 
             Button:
-                id: "repeat"
+                id: repeat
                 text: "REPEAT"
                 on_press: root.repeatSound()
             Button:
-                id: "fill"
+                id: fill
                 text: "FILL"
                 on_press: root.fill()
 
 
+        TextInput:
+            id: input_text_mate
+            size_hint_y: None
+            height: '0dp'
+            text: ""
+    
 <PrintScreen>:
 
     BoxLayout:

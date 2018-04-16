@@ -32,8 +32,6 @@ import cv2
 import imutils
 from tesserocr import PyTessBaseAPI, PSM, RIL
 
-from pygame import mixer
-
 
 
 
@@ -49,20 +47,23 @@ class CameraScreen(Screen):
         Function to capture the images and give them the names
         according to their captured time and date.
         '''
-        camera = self.ids['camera']
+        # camera = self.ids['camera']
         # timestr = time.strftime("%Y%m%d_%H%M%S")
-        camera.export_to_png("IMG")
+        # camera.export_to_png("IMG")
         print("Saved")
         # self.changeScreen()
         return Maddy(source = "IMG")
-
+  
 
 class ControlScreen(Screen):
     global filename
-    filename = "IMG"
+    filename = "fake_form.jpg"
 
     def __init__(self, **kwargs):
-        super(ControlScreen, self).__init__(**kwargs) 
+        super(ControlScreen, self).__init__(**kwargs)
+    
+    def build(self):
+        self.init_things()
 
     # ------------------------
     # ------------------------
@@ -159,7 +160,6 @@ class ControlScreen(Screen):
         # ratio = image.shape[0] / 500.0
         # orig = image.copy()
         # image = imutils.resize(image, height=500)
-
         # convert the image to grayscale, blur it, and find edges
         # in the image
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -248,7 +248,7 @@ class ControlScreen(Screen):
 
         THRESHOLD_VALUE = 200
 
-        # filename = "fake_form.jpg"
+        filename = "fake_form.jpg"
         image = Image.open(filename)
         image = image.convert("L")
         # image.show()
@@ -845,7 +845,7 @@ class ControlScreen(Screen):
                     dp[i].append(int(dp[i - 1][j] + dp[i][j - 1] -
                                     dp[i - 1][j - 1] + int(self.is_white(img[i, j]))))
 
-    def find_blank(self, num_points=5):
+    def find_blank(self, num_points=1):
         boxes = []
         for num in range(num_points):
             self.preprocess_dp()
@@ -971,9 +971,15 @@ class ControlScreen(Screen):
     # blocks = self.create_blocks_of_text(filename)
     # blanks = self.blank_init(filename)
     def init_things(self):
+        print("initializing things")
+        prompt = "obas"
+        tts = gTTS(text=prompt, lang='en', slow=True)
+        tts.save("obas.mp3")
+        playsound("obas.mp3")
+        print("help")
         self.scan69 = self.scan(filename)
         self.document = Image.open(filename)
-        self.document.show()
+        # self.document.show()
         self.blocks = self.create_blocks_of_text(filename)
         self.blanks = self.blank_init(filename)
         self.i = 0
@@ -999,9 +1005,9 @@ class ControlScreen(Screen):
 
     # def displayScreenThenLeave(self):
     #     self.changeScreen()
-    @staticmethod
-    def on_enter1(instance, value):
-        self.input = value
+    # @staticmethod
+    # def on_enter1(instance, value):
+    #     self.input = value
 
     def repeatSound(self):
         print("repeatSound")
@@ -1026,8 +1032,8 @@ class ControlScreen(Screen):
         # implement goNext
         if self.i < self.n-1    :
             self.i += 1
-            text = self.blocks[self.i][1]
-            tts = gTTS(text=text, lang='en', slow=True)
+            prompt = self.blocks[self.i][1]
+            tts = gTTS(text=prompt, lang='en', slow=True)
             tts.save("field%s.mp3"%self.i)
             playsound("field%s.mp3"%self.i)
     
@@ -1035,44 +1041,43 @@ class ControlScreen(Screen):
         print("fill")
         # we want a text box to appear
         # when e
-        textinput = TextInput(text='', multiline=False)
-        textinput.bind(on_text_validate=on_enter1)
-        self.blocks[self.i][1] = self.input
+        layout = BoxLayout(padding=10, orientation='vertical')
+        self.textinput = TextInput(text='', multiline=False)
+        # layout.add_widget(self.textinput)
+        print(self.textinput.text)
+        print(type(self.blocks))
+        # self.blocks[self.i][0]['text'] = self.textinput.text
+        self.blocks[self.i][0]['text'] = "obas"
 
         # implement fill
     def help(self):
         print("help")
-        self.test()
+        print(self.ids)
+        self.ids.obas.size_hint = [0, 0]
+        self.ids.input_text_mate.size_hint_y = 1
+        self.ids.input_text_mate.height = '60dp'
+
         # implement help
     def print_end(self):
         for c in range(self.n):
             x = self.blocks[c][0]['x']+self.blocks[c][0]['w']//2
             y = self.blocks[c][0]['y']+self.blocks[c][0]['h']//2
             idx = self.match((x,y), self.blanks)
-            start = self.blanks[idx][0] # tuple upper left
+            start = self.blanks[idx][0] # t\\\\\7uple upper left
             d = ImageDraw.Draw(self.document)
-            d.text((start[0]+4, start[1]+4), self.blocks[c][1])
+            d.text((start[0]+4, start[1]+4), self.blocks[c][0]['text'])
         # save image
         # or show image
         d.show()
 
         print("print")
 
-        # implement print
-    def test(self):
-        # engine = pyttsx3.init()
-        # engine.say('Sally sells seashells by the seashore.')
-        # engine.say('The quick brown fox jumped over the lazy dog.')
-        # engine.runAndWait()
-        print("5")
-        return 5
-
-
-
-
 class PrintScreen(Screen):
     pass
 
+    # def t69t(self):
+    #     print("obas")
+    #     return "gosho69"
 class Manager(ScreenManager):
 
     camera_screen = ObjectProperty(None)
