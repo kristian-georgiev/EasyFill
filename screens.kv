@@ -18,7 +18,8 @@
             on_press: root.capture()
             on_release: root.manager.current = "control_screen"
 
-<ControlScreen>:       
+<ControlScreen>:
+    on_enter: root.init_things()  
 
     BoxLayout:
         id: obas
@@ -109,3 +110,4 @@
         id: print_screen
         name: "print_screen"
         manager: screen_manager
+

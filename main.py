@@ -968,7 +968,7 @@ class ControlScreen(Screen):
 
     def init_things(self):
         print("initializing things")
-        prompt = "Help button to the left, print to the right and so on, we'll write this later"
+        prompt = "The help button is at the top left corner. It contains instrunctions. We are processing the input image. Please wait until you hear a confirmation."
         tts = gTTS(text=prompt, lang='en', slow=False)
         tts.save("obas.mp3")
         playsound("obas.mp3")
@@ -979,6 +979,11 @@ class ControlScreen(Screen):
         self.blanks = self.blank_init(filename)
         self.i = 0
         self.n = len(self.blocks)
+        print("initializing things")
+        prompt = "Ready to go!"
+        tts = gTTS(text=prompt, lang='en', slow=False)
+        tts.save("obas.mp3")
+        playsound("obas.mp3")
 
 
     # ------------------------
@@ -1068,8 +1073,8 @@ class ControlScreen(Screen):
 
     def fill(self):
         print("fill")
-
         self.inputText = TextInput(text="",multiline=False, write_tab=False)
+        self.inputText.focus = True
         print(self.inputText.text + 'this is inputText')
         self.add_widget(self.inputText)
         Window.bind(on_key_down=self._on_keyboard_down) # when enter key is pressed
@@ -1077,6 +1082,11 @@ class ControlScreen(Screen):
         # implement fill
     def help(self):
         print("help")
+        print("initializing things")
+        prompt = "Put actual text here"
+        tts = gTTS(text=prompt, lang='en', slow=False)
+        tts.save("obas.mp3")
+        playsound("obas.mp3")
 
         # implement help
     def print_end(self):
