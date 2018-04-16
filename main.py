@@ -1,9 +1,3 @@
-# from kivy.app import App
-# from kivy.lang import Builder
-# from kivy.uix.boxlayout import BoxLayout
-# from kivy.core.image import Image as CoreImage
-# from kivy.uix.image import Image
-# import time
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
@@ -24,6 +18,7 @@ from gtts import gTTS
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFilter
+from PIL import ImageFont
 
 from skimage.filters import threshold_local
 import numpy as np
@@ -49,17 +44,15 @@ class CameraScreen(Screen):
         according to their captured time and date.
         '''
         camera = self.ids['camera']
-        # timestr = time.strftime("%Y%m%d_%H%M%S")
         camera.export_to_png("IMG")
         print("Saved")
-        # self.changeScreen()
         return Maddy(source = "IMG")
   
 
 class ControlScreen(Screen):
     global filename
     global inputText
-    filename = "fake_form.jpg"
+    filename = "testform.jpg"
 
     def __init__(self, **kwargs):
         super(ControlScreen, self).__init__(**kwargs)
@@ -250,7 +243,7 @@ class ControlScreen(Screen):
 
         THRESHOLD_VALUE = 200
 
-        filename = "fake_form.jpg"
+        filename = "testform.jpg"
         image = Image.open(filename)
         image = image.convert("L")
         # image.show()
@@ -972,21 +965,20 @@ class ControlScreen(Screen):
     # scan = self.scan(filename)
     # blocks = self.create_blocks_of_text(filename)
     # blanks = self.blank_init(filename)
+
     def init_things(self):
         print("initializing things")
-        prompt = "obas"
-        tts = gTTS(text=prompt, lang='en', slow=True)
+        prompt = "Help button to the left, print to the right and so on, we'll write this later"
+        tts = gTTS(text=prompt, lang='en', slow=False)
         tts.save("obas.mp3")
         playsound("obas.mp3")
-        print("help")
         self.scan69 = self.scan(filename)
         self.document = Image.open(filename)
         # self.document.show()
         self.blocks = self.create_blocks_of_text(filename)
         self.blanks = self.blank_init(filename)
         self.i = 0
-        self.n = len(self.blocks) 
-        self.input = ''
+        self.n = len(self.blocks)
 
 
     # ------------------------
@@ -1014,9 +1006,11 @@ class ControlScreen(Screen):
     def repeatSound(self):
         print("repeatSound")
         text = self.blocks[self.i][1]
+        if text == "":
+            text = "No text to speak here."
         tts = gTTS(text=text, lang='en', slow=True)
-        tts.save("field%s.mp3"%self.i)
-        playsound("field%s.mp3"%self.i)
+        tts.save("field%s.mp3" % self.i)
+        playsound("field%s.mp3" % self.i)
 
         # implement repeatSOund
     def goBack(self):
@@ -1024,21 +1018,25 @@ class ControlScreen(Screen):
         if self.i > 0:
             self.i -= 1
             text = self.blocks[self.i][1]
+            if text == "":
+                text = "No text to speak here."
             tts = gTTS(text=text, lang='en', slow=True)
-            tts.save("field%s.mp3"%self.i)
-            playsound("field%s.mp3"%self.i)
+            tts.save("field%s.mp3" % self.i)
+            playsound("field%s.mp3" % self.i)
 
         # implement goBack
     def goNext(self):
         print("goNext")
         # implement goNext
-        if self.i < self.n-1    :
+        if self.i < self.n - 1:
             self.i += 1
-            prompt = self.blocks[self.i][1]
-            tts = gTTS(text=prompt, lang='en', slow=True)
-            tts.save("field%s.mp3"%self.i)
-            playsound("field%s.mp3"%self.i)
-    
+            text = self.blocks[self.i][1]
+            if text == "":
+                text = "No text to speak here."
+            tts = gTTS(text=text, lang='en', slow=True)
+            tts.save("field%s.mp3" % self.i)
+            playsound("field%s.mp3" % self.i)
+
         # called when the user presses enter   
         #rn called immediately :() 
     # def on_enter(self, instance):
@@ -1058,7 +1056,9 @@ class ControlScreen(Screen):
         print("saveText reached")
         inputTextString = self.inputText.text # this is the String
         self.remove_widget(self.inputText)
+        self.blocks[self.i][0]['text'] = inputTextString
         print(inputTextString)
+
         # return self.inputTextSring
 
     def _on_keyboard_down(self, instance, keyboard, keycode, text, modifiers):
@@ -1069,7 +1069,7 @@ class ControlScreen(Screen):
     def fill(self):
         print("fill")
 
-        self.inputText = TextInput(text="Helo WOr",multiline=False, write_tab=False)
+        self.inputText = TextInput(text="",multiline=False, write_tab=False)
         print(self.inputText.text + 'this is inputText')
         self.add_widget(self.inputText)
         Window.bind(on_key_down=self._on_keyboard_down) # when enter key is pressed
@@ -1080,17 +1080,25 @@ class ControlScreen(Screen):
 
         # implement help
     def print_end(self):
+        draw = ImageDraw.Draw(self.document)
+        fnt = ImageFont.truetype('Pillow/Tests/fonts/FreeMono.ttf', 80)
         for c in range(self.n):
-            x = self.blocks[c][0]['x']+self.blocks[c][0]['w']//2
-            y = self.blocks[c][0]['y']+self.blocks[c][0]['h']//2
-            idx = self.match((x,y), self.blanks)
-            start = self.blanks[idx][0] # t\\\\\7uple upper left
-            d = ImageDraw.Draw(self.document)
-            d.text((start[0]+4, start[1]+4), self.blocks[c][0]['text'])
+            if self.blocks[c][0].get('text', None) != None:
+                x = self.blocks[c][0]['x'] + self.blocks[c][0]['w'] // 2
+                y = self.blocks[c][0]['y'] + self.blocks[c][0]['h'] // 2
+                idx = self.match((x, y), self.blanks)
+                start = self.blanks[idx][0]  # t\\\\\7uple upper left
+                print((start[0] + 4, start[1] + 4))
+                print(self.blocks[c][0]['text'])
+                ans = self.blocks[c][0]['text']
+                # ans = "test" # for testing purposes, remove later
+                fnt = ImageFont.truetype(
+                    'Pillow/Tests/fonts/FreeMono.ttf', 2 * y - 6)
+                draw.text((start[0] + 4, start[1] + 4),
+                          ans, font=fnt, fill=(0, 0, 0))
         # save image
         # or show image
-        d.show()
-        print("printing...")
+        self.document.show()
 
 
 class PrintScreen(Screen):
