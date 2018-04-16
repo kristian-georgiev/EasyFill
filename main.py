@@ -34,17 +34,15 @@ from kivy.core.window import Window
 class CameraScreen(Screen):
 
     def welcome(self):
-        prompt = "Welcome! Please take a clear photo of the form. You can take a photo by clicking anywhere on the screen."
-        tts = gTTS(text=prompt, lang='en', slow=False)
-        tts.save("welcome.mp3")
-        playsound("welcome.mp3")
+        pass
+        # playsound("welcome.mp3")
 
 
     def changeScreen(self):
 
         THRESHOLD_VALUE = 200
 
-        filename = "w2-high-res.png"
+        filename = "mock_form.png"
         image = Image.open(filename)
         image = image.convert("L")
         # image.show()
@@ -88,6 +86,7 @@ class CameraScreen(Screen):
         Function to capture the images and give them the names
         according to their captured time and date.
         '''
+        self.welcome()
         camera = self.ids['camera']
         camera.export_to_png("IMG")
         print("Saved")
@@ -97,7 +96,7 @@ class CameraScreen(Screen):
 class ControlScreen(Screen):
     global filename
     global inputText
-    filename = "w2-high-res.png"
+    filename = "mock_form.png"
 
     def __init__(self, **kwargs):
         super(ControlScreen, self).__init__(**kwargs)
@@ -288,7 +287,7 @@ class ControlScreen(Screen):
 
         THRESHOLD_VALUE = 200
 
-        filename = "w2-high-res.png"
+        filename = "mock_form.png"
         image = Image.open(filename)
         image = image.convert("L")
         # image.show()
@@ -599,7 +598,7 @@ class ControlScreen(Screen):
                     dp[i].append(int(dp[i - 1][j] + dp[i][j - 1] -
                                     dp[i - 1][j - 1] + int(self.is_white(img[i, j]))))
 
-    def find_blank(self, num_points=15):
+    def find_blank(self, num_points=5):
         boxes = []
         for num in range(num_points):
             self.preprocess_dp()
@@ -862,7 +861,7 @@ class ControlScreen(Screen):
                 ans = self.blocks[c][0]['text']
                 # ans = "test" # for testing purposes, remove later
                 fnt = ImageFont.truetype(
-                    'Pillow/Tests/fonts/FreeMono.ttf', 2 * y - 6)
+                    'Pillow/Tests/fonts/FreeMono.ttf', self.blocks[c][0]['h'] // 2)
                 draw.text((start[0] + 4, start[1] + 4),
                           ans, font=fnt, fill=(0, 0, 0))
         # save image
