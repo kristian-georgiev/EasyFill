@@ -1051,11 +1051,8 @@ class ControlScreen(Screen):
 
         # implement fill
     def help(self):
-        print("help")
-        print(self.ids)
-        self.ids.obas.size_hint = [0, 0]
         self.ids.input_text_mate.size_hint_y = 1
-        self.ids.input_text_mate.height = '60dp'
+        self.ids.input_text_mate.height = "150dp"
 
         # implement help
     def print_end(self):
