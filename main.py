@@ -48,9 +48,9 @@ class CameraScreen(Screen):
         Function to capture the images and give them the names
         according to their captured time and date.
         '''
-        # camera = self.ids['camera']
+        camera = self.ids['camera']
         # timestr = time.strftime("%Y%m%d_%H%M%S")
-        # camera.export_to_png("IMG")
+        camera.export_to_png("IMG")
         print("Saved")
         # self.changeScreen()
         return Maddy(source = "IMG")
@@ -58,6 +58,7 @@ class CameraScreen(Screen):
 
 class ControlScreen(Screen):
     global filename
+    global inputText
     filename = "fake_form.jpg"
 
     def __init__(self, **kwargs):
@@ -1055,8 +1056,10 @@ class ControlScreen(Screen):
 
     def saveText(self):
         print("saveText reached")
-        self.inputTextString = self.inputText.text # this is the String
+        inputTextString = self.inputText.text # this is the String
         self.remove_widget(self.inputText)
+        print(inputTextString)
+        # return self.inputTextSring
 
     def _on_keyboard_down(self, instance, keyboard, keycode, text, modifiers):
         if keycode == 40:  # 40 - Enter key pressed
@@ -1066,11 +1069,10 @@ class ControlScreen(Screen):
     def fill(self):
         print("fill")
 
-        self.inputText = TextInput(id= "Hello", text="Helo WOr",multiline=False, write_tab=False)
+        self.inputText = TextInput(text="Helo WOr",multiline=False, write_tab=False)
         print(self.inputText.text + 'this is inputText')
         self.add_widget(self.inputText)
         Window.bind(on_key_down=self._on_keyboard_down) # when enter key is pressed
-        print(self.inputTextString)
 
         # implement fill
     def help(self):
