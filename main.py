@@ -32,6 +32,7 @@ import cv2
 import imutils
 from tesserocr import PyTessBaseAPI, PSM, RIL
 
+from kivy.core.window import Window
 
 
 
@@ -1037,22 +1038,43 @@ class ControlScreen(Screen):
             tts.save("field%s.mp3"%self.i)
             playsound("field%s.mp3"%self.i)
     
+        # called when the user presses enter   
+        #rn called immediately :() 
+    # def on_enter(self, instance):
+        # print("reached here")
+        # TODO: say something like: "your changes have been saved"
+        # print(self.ids.input_text_mate.text)
+
+
+    # this was textinput in .ky, bring back if necessary
+    #     TextInput:
+    #     id: input_text_mate
+    #     size_hint_y: None
+    #     height: '0dp'
+    #     text: ""
+
+    def saveText(self):
+        print("saveText reached")
+        self.inputTextString = self.inputText.text # this is the String
+        self.remove_widget(self.inputText)
+
+    def _on_keyboard_down(self, instance, keyboard, keycode, text, modifiers):
+        if keycode == 40:  # 40 - Enter key pressed
+            # to fix: make sure it's focused on inputext when pressed eg something like; self.test3.focus
+            self.saveText()
+
     def fill(self):
         print("fill")
-        # we want a text box to appear
-        # when e
-        layout = BoxLayout(padding=10, orientation='vertical')
-        self.textinput = TextInput(text='', multiline=False)
-        # layout.add_widget(self.textinput)
-        print(self.textinput.text)
-        print(type(self.blocks))
-        # self.blocks[self.i][0]['text'] = self.textinput.text
-        self.blocks[self.i][0]['text'] = "obas"
+
+        self.inputText = TextInput(id= "Hello", text="Helo WOr",multiline=False, write_tab=False)
+        print(self.inputText.text + 'this is inputText')
+        self.add_widget(self.inputText)
+        Window.bind(on_key_down=self._on_keyboard_down) # when enter key is pressed
+        print(self.inputTextString)
 
         # implement fill
     def help(self):
-        self.ids.input_text_mate.size_hint_y = 1
-        self.ids.input_text_mate.height = "150dp"
+        print("help")
 
         # implement help
     def print_end(self):
@@ -1066,8 +1088,8 @@ class ControlScreen(Screen):
         # save image
         # or show image
         d.show()
+        print("printing...")
 
-        print("print")
 
 class PrintScreen(Screen):
     pass
