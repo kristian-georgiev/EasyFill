@@ -30,19 +30,19 @@ from tesserocr import PyTessBaseAPI, PSM, RIL
 from kivy.core.window import Window
 
 
+global filename
+filename = "mock_mock.png"
 
 class CameraScreen(Screen):
 
     def welcome(self):
-        pass
-        # playsound("welcome.mp3")
+        playsound("welcome.mp3")
 
 
     def changeScreen(self):
 
         THRESHOLD_VALUE = 200
 
-        filename = "mock_form.png"
         image = Image.open(filename)
         image = image.convert("L")
         # image.show()
@@ -94,10 +94,6 @@ class CameraScreen(Screen):
   
 
 class ControlScreen(Screen):
-    global filename
-    global inputText
-    filename = "mock_form.png"
-
     def __init__(self, **kwargs):
         super(ControlScreen, self).__init__(**kwargs)
     
@@ -286,8 +282,6 @@ class ControlScreen(Screen):
 
 
         THRESHOLD_VALUE = 200
-
-        filename = "mock_form.png"
         image = Image.open(filename)
         image = image.convert("L")
         # image.show()
@@ -340,7 +334,7 @@ class ControlScreen(Screen):
 
     def is_white(self, pixel_val):
         """tuple with (r, g, b) values"""
-        return pixel_val > 250  # allow a small noise for white
+        return pixel_val[1] > 250  # allow a small noise for white
 
     def inside_image(self, coords):
         global img
@@ -559,13 +553,13 @@ class ControlScreen(Screen):
         global img
         for col in range(ul[0], lr[0] + 1):
             for row in range(ul[1], lr[1] + 1):
-                img[col, row] = 255  # make everything green!
+                img[col, row] = (0,255,0)  # make everything green!
 
     def fill_box(self, ul, lr):  # fill in rectangle from upper-left to lower-right
         global img
         for col in range(ul[0], lr[0] + 1):
             for row in range(ul[1], lr[1] + 1):
-                img[col, row] = 255  # make everything white!
+                img[col, row] = (255,255,255)  # make everything white!
 
 
     # get number of white pixels in rectangle from upper-left to lower-right
@@ -598,7 +592,7 @@ class ControlScreen(Screen):
                     dp[i].append(int(dp[i - 1][j] + dp[i][j - 1] -
                                     dp[i - 1][j - 1] + int(self.is_white(img[i, j]))))
 
-    def find_blank(self, num_points=5):
+    def find_blank(self, num_points=4):
         boxes = []
         for num in range(num_points):
             self.preprocess_dp()
@@ -609,7 +603,7 @@ class ControlScreen(Screen):
                     (point[0] + right, point[1] + down))
             boxes.append(((point[0] - left, point[1] - up),
                         (point[0] + right, point[1] + down)))
-            self.fill_box((point[0]-10, point[1]-10), (point[0]+10, point[1]+10))
+            # self.fill_box((point[0]-10, point[1]-10), (point[0]+10, point[1]+10))
         return boxes
 
     def blank_init(self, filename):
@@ -618,7 +612,7 @@ class ControlScreen(Screen):
         im = Image.open(filename)
         im1 = im.filter(ImageFilter.FIND_EDGES)
         im2 = im1.filter(ImageFilter.MaxFilter(size=7))
-        rgb_im1 = im2.convert('L')
+        rgb_im1 = im2.convert('RGB')
         #rgb_im1.show()
         global img
         global dp
@@ -629,7 +623,7 @@ class ControlScreen(Screen):
         #print(height)
         img = rgb_im1.load()
         poullas = self.find_blank()
-        #rgb_im1.show()
+        rgb_im1.show()
         return poullas
 
 
@@ -725,17 +719,12 @@ class ControlScreen(Screen):
     # blanks = self.blank_init(filename)
 
     def init_things(self):
-        print("initializing things")    
-        prompt = "The help button is at the top left corner. It contains instructions. We are processing the input image. Please wait until you hear a confirmation."
-        tts = gTTS(text=prompt, lang='en', slow=False)
-        tts.save("init_instructions.mp3")
         playsound("init_instructions.mp3")
         self.scan69 = self.scan(filename)
-        cv2.imwrite("scan.jpg",self.scan69)
+        cv2.imwrite("scan.png",self.scan69)
         self.document = Image.open(filename)
-        self.document.show()
-        scanname = "scan.jpg"
-        self.blocks = self.create_blocks_of_text(scanname)
+        scanname = "scan.png"
+        self.blocks = self.create_blocks_of_text(filename)
         self.blanks = self.blank_init(filename)
         self.i = 0
         self.n = len(self.blocks)
@@ -769,7 +758,12 @@ class ControlScreen(Screen):
 
     def repeatSound(self):
         print("repeatSound")
-        text = self.blocks[self.i][1]
+        if self.blocks[self.i][0].get('text',None) == None:
+            response = ""
+        else:
+            response = ". Your response is currently " + \
+                self.blocks[self.i][0]['text']
+        text = self.blocks[self.i][1] + response
         if text == "":
             text = "No text to speak here."
         tts = gTTS(text=text, lang='en', slow=True)
@@ -781,12 +775,12 @@ class ControlScreen(Screen):
         print("goBack")
         if self.i > 0:
             self.i -= 1
-            text = self.blocks[self.i][1]
-            if text == "":
-                text = "No text to speak here."
-            tts = gTTS(text=text, lang='en', slow=True)
-            tts.save("field%s.mp3" % self.i)
-            playsound("field%s.mp3" % self.i)
+            self.repeatSound()
+        else:
+            text = "You are already at the first block."
+            tts = gTTS(text=text, lang='en', slow=False)
+            tts.save("first.mp3")
+            playsound("first.mp3")
 
         # implement goBack
     def goNext(self):
@@ -794,20 +788,19 @@ class ControlScreen(Screen):
         # implement goNext
         if self.i < self.n - 1:
             self.i += 1
-            text = self.blocks[self.i][1]
-            if text == "":
-                text = "No text to speak here."
-            tts = gTTS(text=text, lang='en', slow=True)
-            tts.save("field%s.mp3" % self.i)
-            playsound("field%s.mp3" % self.i)
+            self.repeatSound()
+        else:
+            text = "You are already at the last block."
+            tts = gTTS(text=text, lang='en', slow=False)
+            tts.save("last.mp3")
+            playsound("last.mp3")
 
-        # called when the user presses enter   
-        #rn called immediately :() 
+        # called when the user presses enter
+        #rn called immediately :()
     # def on_enter(self, instance):
         # print("reached here")
         # TODO: say something like: "your changes have been saved"
         # print(self.ids.input_text_mate.text)
-
 
     # this was textinput in .ky, bring back if necessary
     #     TextInput:
@@ -818,7 +811,7 @@ class ControlScreen(Screen):
 
     def saveText(self):
         print("saveText reached")
-        inputTextString = self.inputText.text # this is the String
+        inputTextString = self.inputText.text  # this is the String
         self.remove_widget(self.inputText)
         self.blocks[self.i][0]['text'] = inputTextString
         print(inputTextString)
@@ -832,16 +825,19 @@ class ControlScreen(Screen):
 
     def fill(self):
         print("fill")
-        self.inputText = TextInput(text="",multiline=False, write_tab=False)
+        self.inputText = TextInput(text="", multiline=False, write_tab=False)
         self.inputText.focus = True
         print(self.inputText.text + 'this is inputText')
         self.add_widget(self.inputText)
-        Window.bind(on_key_down=self._on_keyboard_down) # when enter key is pressed
+        # when enter key is pressed
+        Window.bind(on_key_down=self._on_keyboard_down)
 
         # implement fill
     def help(self):
         print("help")
-        prompt = "Put actual text here"
+        prompt = "There are six buttons on the screen, arranged in a 3 by 2 grid. Bottom left says out the current block of text. Bottom right \
+        allows you to fill in an answer. Middle left goes to the previous block and middle right goes to the next one. Top left is help.\
+        Top right prints the filled form to a pdf file and sends it to an email."
         tts = gTTS(text=prompt, lang='en', slow=False)
         tts.save("help_instructions.mp3")
         playsound("help_instructions.mp3")
@@ -860,11 +856,13 @@ class ControlScreen(Screen):
                 print(self.blocks[c][0]['text'])
                 ans = self.blocks[c][0]['text']
                 # ans = "test" # for testing purposes, remove later
+                height = (self.blanks[idx][1][1] - self.blanks[idx][0][1]) // 2
                 fnt = ImageFont.truetype(
-                    'Pillow/Tests/fonts/FreeMono.ttf', self.blocks[c][0]['h'] // 2)
+                    'Pillow/Tests/fonts/FreeMono.ttf',  height)
                 draw.text((start[0] + 4, start[1] + 4),
                           ans, font=fnt, fill=(0, 0, 0))
         # save image
+        self.document.save("result.pdf", "PDF", Quality=100)
         # or show image
         self.document.show()
 
